@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "系统状态": {
+      "type": "object",
+      "properties": {
+        "地点": {
+          "type": "string"
+        },
+        "时间": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "地点",
+        "时间"
+      ]
+    },
+    "魔女状态": {
+      "type": "object",
+      "properties": {
+        "基础属性": {
+          "type": "object",
+          "properties": {
+            "耐久值": {
+              "type": "number"
+            },
+            "堕落度": {
+              "type": "number"
+            },
+            "服从度": {
+              "type": "number"
+            },
+            "敏感度": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "耐久值",
+            "堕落度",
+            "服从度",
+            "敏感度"
+          ]
+        },
+        "身体记录": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "description": "部位名"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "开发程度": {
+                "type": "number"
+              },
+              "敏感等级": {
+                "type": "number"
+              },
+              "特殊状态": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "开发程度",
+              "敏感等级",
+              "特殊状态"
+            ]
+          }
+        },
+        "同步道具": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "description": "道具名"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "状态": {
+                "type": "string"
+              },
+              "是否同步": {
+                "type": "boolean"
+              },
+              "使用次数": {
+                "default": 0,
+                "type": "number"
+              }
+            },
+            "required": [
+              "状态",
+              "是否同步"
+            ]
+          }
+        }
+      },
+      "required": [
+        "基础属性",
+        "身体记录",
+        "同步道具"
+      ]
+    },
+    "主角": {
+      "type": "object",
+      "properties": {
+        "物品栏": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "description": "物品名"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "描述": {
+                "type": "string"
+              },
+              "数量": {
+                "default": 1,
+                "type": "number"
+              }
+            },
+            "required": [
+              "描述"
+            ]
+          }
+        }
+      },
+      "required": [
+        "物品栏"
+      ]
+    }
+  },
+  "required": [
+    "系统状态",
+    "魔女状态",
+    "主角"
+  ]
+}

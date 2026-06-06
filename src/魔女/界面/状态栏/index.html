@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="展示魔女莉莉丝当前地点、时间、身体状态、同步道具与主角物品栏的沉浸式状态栏。" />
+    <title>魔女莉莉丝状态栏</title>
+  </head>
+  <body>
+    <main id="witch-status-app" class="status-shell" aria-labelledby="witch-status-title">
+      <h1 id="witch-status-title" class="sr-only">魔女莉莉丝状态栏</h1>
+
+      <header id="world-status-bar" class="world-bar" aria-label="时间与地点">
+        <div class="world-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="img">
+            <path d="M12 2.5 14.6 8l6 .8-4.3 4.1 1 5.9L12 16l-5.3 2.8 1-5.9L3.4 8.8l6-.8L12 2.5Z" />
+          </svg>
+        </div>
+        <div class="world-copy">
+          <p class="eyebrow">空间坐标</p>
+          <p id="status-location" class="world-value">读取中</p>
+        </div>
+        <div class="world-divider" aria-hidden="true"></div>
+        <div class="world-copy">
+          <p class="eyebrow">叙事时间</p>
+          <p id="status-time" class="world-value">读取中</p>
+        </div>
+      </header>
+
+      <div class="status-grid">
+        <section id="witch-state-panel" class="glass-panel witch-panel" aria-labelledby="witch-state-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">核心角色</p>
+              <h2 id="witch-state-heading">莉莉丝状态</h2>
+            </div>
+            <span id="sync-summary" class="sync-badge">同步待确认</span>
+          </div>
+
+          <div id="attribute-grid" class="attribute-grid" aria-label="基础属性"></div>
+
+          <div class="subsection-title">
+            <span>身体记录</span>
+          </div>
+          <div id="body-record-grid" class="body-record-grid" aria-label="身体记录"></div>
+
+          <div class="subsection-title">
+            <span>同步道具</span>
+          </div>
+          <div id="sync-tool-list" class="sync-tool-list" aria-label="同步道具"></div>
+        </section>
+
+        <aside id="witch-portrait-panel" class="portrait-panel" aria-labelledby="witch-portrait-heading">
+          <h2 id="witch-portrait-heading" class="sr-only">莉莉丝立绘舞台</h2>
+          <figure id="witch-portrait-stage" class="portrait-stage" aria-label="莉莉丝立绘展示区域">
+            <div class="portrait-frame" aria-hidden="true">
+              <svg class="portrait-figure" viewBox="0 0 260 390" role="img">
+                <defs>
+                  <linearGradient id="portraitGradient" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#ffd6a8" />
+                    <stop offset="46%" stop-color="#d785ff" />
+                    <stop offset="100%" stop-color="#53f4d1" />
+                  </linearGradient>
+                  <linearGradient id="robeGradient" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#2b1738" />
+                    <stop offset="100%" stop-color="#111827" />
+                  </linearGradient>
+                </defs>
+                <path class="sigil-ring" d="M130 22a108 108 0 1 1 0 216 108 108 0 0 1 0-216Z" />
+                <path class="hat" d="M53 109c34-8 62-51 76-86 20 37 45 74 85 86-45 16-112 16-161 0Z" />
+                <path class="hair" d="M82 128c2-45 24-71 51-71 33 0 55 28 53 75-1 22-8 45-21 62H101c-13-19-20-40-19-66Z" />
+                <path class="face" d="M102 119c4-28 20-43 34-43 18 0 34 19 34 47 0 33-17 59-34 59-19 0-38-27-34-63Z" />
+                <path class="glasses" d="M108 124h19m17 0h19m-36 0c0 8-5 14-12 14s-12-6-12-14 5-14 12-14 12 6 12 14Zm42 0c0 8-5 14-12 14s-12-6-12-14 5-14 12-14 12 6 12 14Z" />
+                <path class="robe" d="M66 354c10-98 28-157 70-157 40 0 61 58 72 157H66Z" />
+                <path class="rune-lines" d="M93 254h86M83 302h105M129 219v112m-25-93 51 74m16-74-50 74" />
+              </svg>
+            </div>
+            <figcaption class="portrait-caption">
+              <span>莉莉丝</span>
+              <strong id="portrait-state">状态读取中</strong>
+            </figcaption>
+          </figure>
+        </aside>
+      </div>
+
+      <section id="inventory-panel" class="glass-panel inventory-panel" aria-labelledby="inventory-heading">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow">主角</p>
+            <h2 id="inventory-heading">物品栏</h2>
+          </div>
+          <span id="inventory-count" class="inventory-count">0 件</span>
+        </div>
+        <div id="inventory-grid" class="inventory-grid" aria-label="主角物品栏"></div>
+      </section>
+    </main>
+  </body>
+</html>
