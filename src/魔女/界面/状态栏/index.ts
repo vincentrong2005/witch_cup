@@ -7,6 +7,12 @@ type BodyRecord = StatusData['魔女状态']['身体记录'][string];
 type SyncTool = StatusData['魔女状态']['同步道具'][string];
 type InventoryItem = StatusData['主角']['物品栏'][string];
 
+const portraitUrls = [
+  'https://img.vinsimage.org/%E9%AD%94%E5%A5%B3/%E9%AD%94%E5%A5%B3/%E9%AD%94%E5%A5%B31.png',
+  'https://img.vinsimage.org/%E9%AD%94%E5%A5%B3/%E9%AD%94%E5%A5%B3/%E9%AD%94%E5%A5%B32.png',
+  'https://img.vinsimage.org/%E9%AD%94%E5%A5%B3/%E9%AD%94%E5%A5%B3/%E9%AD%94%E5%A5%B33.png',
+];
+
 const attributeMeta: Record<AttributeKey, { icon: string; accent: string }> = {
   耐久值: { icon: 'shield', accent: '168 82% 62%' },
   堕落度: { icon: 'flame', accent: '333 88% 70%' },
@@ -116,12 +122,13 @@ const render = (data: StatusData) => {
 
   const bodyRecords = Object.entries(data.魔女状态.身体记录);
   getElement('body-record-grid').innerHTML = bodyRecords.map(renderBodyRecord).join('');
+  getElement('body-count').textContent = `${bodyRecords.length} 项`;
 
   const syncTools = Object.entries(data.魔女状态.同步道具);
   const syncingCount = syncTools.filter(([, tool]) => tool.是否同步).length;
   getElement('sync-tool-list').innerHTML = syncTools.map(renderSyncTool).join('');
+  getElement('sync-count').textContent = `${syncTools.length} 件`;
   getElement('sync-summary').textContent = syncingCount > 0 ? `${syncingCount} 件道具同步中` : '当前无同步';
-  getElement('portrait-state').textContent = syncingCount > 0 ? '空间共感已接通' : '空间共感静默';
 
   const inventory = Object.entries(data.主角.物品栏);
   getElement('inventory-count').textContent = `${inventory.length} 件`;
@@ -139,10 +146,72 @@ const renderFromVariables = () => {
   }
 };
 
+const setRandomPortrait = () => {
+  const portraitImage = getElement<HTMLImageElement>('portrait-image');
+  let portraitIndex = Math.floor(Math.random() * portraitUrls.length);
+
+  portraitImage.onerror = () => {
+    portraitIndex = (portraitIndex + 1) % portraitUrls.length;
+    portraitImage.src = portraitUrls[portraitIndex];
+  };
+  portraitImage.src = portraitUrls[portraitIndex];
+};
+
+const bindPortraitToggle = () => {
+  const panel = getElement('witch-portrait-panel');
+  const stage = getElement('witch-portrait-stage');
+  const clickToToggle = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+
+  const toggleAttributes = () => {
+    const expanded = panel.classList.toggle('attributes-open');
+    panel.setAttribute('aria-expanded', String(expanded));
+  };
+
+  stage.addEventListener('click', () => {
+    if (clickToToggle) {
+      toggleAttributes();
+    }
+  });
+  stage.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleAttributes();
+    }
+  });
+  panel.addEventListener('mouseenter', () => panel.setAttribute('aria-expanded', 'true'));
+  panel.addEventListener('mouseleave', () => {
+    if (!panel.classList.contains('attributes-open')) {
+      panel.setAttribute('aria-expanded', 'false');
+    }
+  });
+};
+
+const bindFoldPanels = () => {
+  const panels = Array.from(document.querySelectorAll<HTMLDetailsElement>('.fold-panel'));
+
+  panels.forEach(panel => {
+    panel.addEventListener('toggle', () => {
+      if (!panel.open) {
+        return;
+      }
+
+      panels.forEach(otherPanel => {
+        if (otherPanel !== panel) {
+          otherPanel.open = false;
+        }
+      });
+    });
+  });
+};
+
 $(async () => {
+  setRandomPortrait();
+
   await waitGlobalInitialized('Mvu');
   await waitUntil(() => _.has(getVariables({ type: 'message' }), 'stat_data'));
 
+  bindPortraitToggle();
+  bindFoldPanels();
   renderFromVariables();
   eventOn(Mvu.events.VARIABLE_INITIALIZED, renderFromVariables);
   eventOn(Mvu.events.VARIABLE_UPDATE_ENDED, renderFromVariables);
