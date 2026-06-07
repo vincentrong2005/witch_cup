@@ -53,30 +53,51 @@
             </div>
           </header>
 
-          <section id="collapsed-panels" class="collapsed-panels" aria-label="状态明细">
-            <details class="glass-panel fold-panel">
-              <summary>
-                <span>身体记录</span>
-                <b id="body-count">0 项</b>
-              </summary>
+          <section id="status-workspace" class="status-workspace" aria-label="状态明细">
+            <section class="glass-panel sync-board" aria-labelledby="sync-board-heading">
+              <div class="section-heading compact">
+                <div>
+                  <h2 id="sync-board-heading">道具槽</h2>
+                </div>
+                <span id="sync-count" class="sync-badge">0 件</span>
+              </div>
+              <div id="sync-tool-list" class="sync-tool-gallery" aria-label="同步道具"></div>
+            </section>
+
+            <section class="quick-info-panel" aria-label="身体记录与物品栏">
+              <div class="quick-info-actions">
+                <button type="button" class="info-switch active" data-info-panel="body">
+                  <span>身体记录</span>
+                  <b id="body-count">0 项</b>
+                </button>
+                <button type="button" class="info-switch" data-info-panel="inventory">
+                  <span id="inventory-heading">物品栏</span>
+                  <b id="inventory-count">0 件</b>
+                </button>
+              </div>
+            </section>
+
+            <section id="sync-detail-view" class="glass-panel sync-detail-view" hidden aria-live="polite">
+              <button type="button" id="sync-detail-close" class="detail-close" aria-label="关闭同步道具详情">×</button>
+              <div id="sync-detail-image" class="sync-detail-image" aria-hidden="true"></div>
+              <div class="sync-detail-copy">
+                <p class="eyebrow">同步道具详情</p>
+                <h2 id="sync-detail-name">道具详情</h2>
+                <p id="sync-detail-status" class="detail-line"></p>
+                <p id="sync-detail-count" class="detail-line"></p>
+              </div>
+            </section>
+
+            <section id="info-detail-view" class="glass-panel info-detail-view" hidden aria-live="polite">
+              <button type="button" id="info-detail-close" class="detail-close" aria-label="关闭信息详情">×</button>
+              <div class="section-heading compact">
+                <div>
+                  <h2 id="info-detail-title">身体记录</h2>
+                </div>
+              </div>
               <div id="body-record-grid" class="body-record-grid" aria-label="身体记录"></div>
-            </details>
-
-            <details class="glass-panel fold-panel">
-              <summary>
-                <span>同步道具</span>
-                <b id="sync-count">0 件</b>
-              </summary>
-              <div id="sync-tool-list" class="sync-tool-list" aria-label="同步道具"></div>
-            </details>
-
-            <details id="inventory-panel" class="glass-panel fold-panel">
-              <summary>
-                <span id="inventory-heading">物品栏</span>
-                <b id="inventory-count">0 件</b>
-              </summary>
               <div id="inventory-grid" class="inventory-grid" aria-label="主角物品栏"></div>
-            </details>
+            </section>
           </section>
         </div>
       </div>

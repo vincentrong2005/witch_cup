@@ -6,12 +6,20 @@ type AttributeKey = keyof StatusData['魔女状态']['基础属性'];
 type BodyRecord = StatusData['魔女状态']['身体记录'][string];
 type SyncTool = StatusData['魔女状态']['同步道具'][string];
 type InventoryItem = StatusData['主角']['物品栏'][string];
+type InfoPanel = 'body' | 'inventory';
 
 const portraitUrls = [
   'https://img.vinsimage.org/%E9%AD%94%E5%A5%B3/%E9%AD%94%E5%A5%B3/%E9%AD%94%E5%A5%B31.png',
   'https://img.vinsimage.org/%E9%AD%94%E5%A5%B3/%E9%AD%94%E5%A5%B3/%E9%AD%94%E5%A5%B32.png',
   'https://img.vinsimage.org/%E9%AD%94%E5%A5%B3/%E9%AD%94%E5%A5%B3/%E9%AD%94%E5%A5%B33.png',
 ];
+
+const syncToolImageUrls: Record<string, string> = {
+  口腔型魔导杯: 'https://img.vinsimage.org/%E9%AD%94%E5%A5%B3/%E5%8F%A3%E8%85%94%E5%9E%8B%E9%AD%94%E5%AF%BC%E6%9D%AF.png',
+  下体型魔导杯: 'https://img.vinsimage.org/%E9%AD%94%E5%A5%B3/%E4%B8%8B%E4%BD%93%E5%9E%8B%E9%AD%94%E5%AF%BC%E6%9D%AF.png',
+  躯干型魔导器: 'https://img.vinsimage.org/%E9%AD%94%E5%A5%B3/%E8%BA%AF%E5%B9%B2%E5%9E%8B%E9%AD%94%E5%AF%BC%E5%99%A8.png',
+  躯干形魔导器: 'https://img.vinsimage.org/%E9%AD%94%E5%A5%B3/%E8%BA%AF%E5%B9%B2%E5%9E%8B%E9%AD%94%E5%AF%BC%E5%99%A8.png',
+};
 
 const attributeMeta: Record<AttributeKey, { icon: string; accent: string }> = {
   耐久值: { icon: 'shield', accent: '168 82% 62%' },
@@ -29,6 +37,8 @@ const icons = {
   spark:
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 5 14h6l-1 8 9-13h-6l0-7Z"/></svg>',
 };
+
+let currentData: StatusData | null = null;
 
 const getElement = <T extends HTMLElement>(id: string) => {
   const element = document.getElementById(id);
@@ -86,14 +96,16 @@ const renderBodyRecord = ([name, record]: [string, BodyRecord]) => {
 
 const renderSyncTool = ([name, tool]: [string, SyncTool]) => {
   const syncing = tool.是否同步;
+  const imageUrl = syncToolImageUrls[name];
   return `
     <article id="${toElementId('sync-tool-card', name)}" class="tool-card${syncing ? '' : ' offline'}">
-      <div class="tool-header">
-        <p class="tool-name">${name}</p>
-        <span class="tool-chip">${syncing ? '同步中' : '未同步'}</span>
-      </div>
-      <p class="tool-meta">状态：${tool.状态}</p>
-      <p class="tool-meta">使用次数：${tool.使用次数}</p>
+      <button type="button" class="tool-image-button" data-sync-tool="${encodeURIComponent(name)}" aria-label="查看${name}详情">
+        ${
+          imageUrl
+            ? `<img class="tool-image" src="${imageUrl}" alt="${name}" />`
+            : '<span class="tool-image-placeholder"></span>'
+        }
+      </button>
     </article>
   `;
 };
@@ -114,6 +126,7 @@ const getStatusData = () => {
 };
 
 const render = (data: StatusData) => {
+  currentData = data;
   getElement('status-location').textContent = data.系统状态.地点;
   getElement('status-time').textContent = data.系统状态.时间;
 
@@ -186,32 +199,69 @@ const bindPortraitToggle = () => {
   });
 };
 
-const bindFoldPanels = () => {
-  const panels = Array.from(document.querySelectorAll<HTMLDetailsElement>('.fold-panel'));
-
-  panels.forEach(panel => {
-    panel.addEventListener('toggle', () => {
-      if (!panel.open) {
-        return;
-      }
-
-      panels.forEach(otherPanel => {
-        if (otherPanel !== panel) {
-          otherPanel.open = false;
-        }
-      });
-    });
+const setActiveInfoPanel = (panel: InfoPanel) => {
+  document.querySelectorAll<HTMLElement>('.info-switch').forEach(button => {
+    button.classList.toggle('active', button.dataset.infoPanel === panel);
   });
+
+  getElement('body-record-grid').classList.toggle('active', panel === 'body');
+  getElement('inventory-grid').classList.toggle('active', panel === 'inventory');
+  getElement('info-detail-title').textContent = panel === 'body' ? '身体记录' : '物品栏';
+  getElement('sync-detail-view').hidden = true;
+  getElement('info-detail-view').hidden = false;
+};
+
+const openSyncDetail = (name: string) => {
+  const tool = _.get(currentData, ['魔女状态', '同步道具', name]) as SyncTool | undefined;
+  if (!tool) {
+    return;
+  }
+
+  getElement('sync-detail-name').textContent = name;
+  getElement('sync-detail-status').textContent = `状态：${tool.状态}`;
+  getElement('sync-detail-count').textContent = `使用次数：${tool.使用次数}`;
+  getElement('sync-detail-image').innerHTML = syncToolImageUrls[name]
+    ? `<img class="tool-image detail-tool-image" src="${syncToolImageUrls[name]}" alt="${name}" />`
+    : '';
+  getElement('info-detail-view').hidden = true;
+  getElement('sync-detail-view').hidden = false;
+};
+
+const closeSyncDetail = () => {
+  getElement('sync-detail-view').hidden = true;
+};
+
+const closeInfoDetail = () => {
+  getElement('info-detail-view').hidden = true;
+};
+
+const bindStatusWorkspace = () => {
+  getElement('status-workspace').addEventListener('click', event => {
+    const target = event.target as HTMLElement;
+    const infoButton = target.closest<HTMLElement>('[data-info-panel]');
+    const syncButton = target.closest<HTMLElement>('[data-sync-tool]');
+
+    if (infoButton?.dataset.infoPanel === 'body' || infoButton?.dataset.infoPanel === 'inventory') {
+      setActiveInfoPanel(infoButton.dataset.infoPanel);
+    }
+
+    if (syncButton?.dataset.syncTool) {
+      openSyncDetail(decodeURIComponent(syncButton.dataset.syncTool));
+    }
+  });
+
+  getElement('sync-detail-close').addEventListener('click', closeSyncDetail);
+  getElement('info-detail-close').addEventListener('click', closeInfoDetail);
 };
 
 $(async () => {
   setRandomPortrait();
+  bindPortraitToggle();
+  bindStatusWorkspace();
 
   await waitGlobalInitialized('Mvu');
   await waitUntil(() => _.has(getVariables({ type: 'message' }), 'stat_data'));
 
-  bindPortraitToggle();
-  bindFoldPanels();
   renderFromVariables();
   eventOn(Mvu.events.VARIABLE_INITIALIZED, renderFromVariables);
   eventOn(Mvu.events.VARIABLE_UPDATE_ENDED, renderFromVariables);
